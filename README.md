@@ -163,3 +163,119 @@ At the end the script show a report and asks for working dir removal. You can sa
 fetched and extracted files will be removed. If you need to keep these file just answer 
 something else and files will be available under the folder `./work-YYMMDD` under the path
 you passed with `dir` positional argument.
+
+
+# Rootless Podman Howto
+
+With Podman we can run a pod with ES and the app in two rootless containers sharing 
+the same network space.
+
+1. We create a new pod with the ports we want to expose (note we expose both ES and api ports):
+```
+$ podman pod create -p 9200:9200 -p 9300:9300 -p 8000:80 cassapod
+```
+2. Then start ES:
+```
+$ podman run --name es02 --pod cassapod  \
+  -e "discovery.type=single-node" \
+  -t docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+```
+3. We create a sharing folder for the ES certificate and an env file (we add the PYTHONPATH 
+   to run the script see bellow):
+```
+$ mkdir share
+$ cat env
+ELASTIC_CERTS_PATH=/usr/local/cassapi/http_ca.crt
+ELASTIC_USER=elastic
+ELASTIC_URL=https://localhost:9200
+ELASTIC_PASSWORD=es_password_here
+ELASTIC_INDEX=testjuri
+ADMIN_PASSWORD=admin_api_password_there
+ADMIN_USER=test
+PYTHONPATH=/usr/src/app
+```
+4. Then copy ES certificate in the sharing folder:
+```
+$ podman cp es02:/usr/share/elasticsearch/config/certs/http_ca.crt ./share/
+```
+5. We can run the api container(built from the Docker file see the docker section):
+```
+$ podman run --pod cassapod  --name cassapi -v ./share:/usr/local/cassapi --env-file env cassapi
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1]
+```
+6. Now we can indexe document from dila repo from the container:
+```
+$ podman exec -it cassapi bash
+root@cassapod:/usr/src/app# echo $PYTHONPATH
+/usr/app
+root@cassapod:/usr/src/app# PYTHONPATH=/usr/src/app python app/scripts/initscript.py https://echanges.dila.gouv.fr/OPENDATA/CASS/ . testjuri
+fetch CASS_20231125-130812.tar.gz
+fetch CASS_20231127-204209.tar.gz
+fetch CASS_20231204-205306.tar.gz
+fetch CASS_20231211-211048.tar.gz
+...
+20240408-211446  90 processed,  47 created,  43 updated,   0 on error and   0 errors on parsing
+clean? y
+bye
+root@cassapod:/usr/src/app# exit
+```
+7. Check the API with
+```
+curl  -v -u test:password_here http://127.0.0.1:8000/summary?page=8 | python -m json.tool --no-ensure-ascii
+```
+   You should get a list of court decisions as expected:
+```
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 127.0.0.1:8000...
+* Connected to 127.0.0.1 (127.0.0.1) port 8000
+* Server auth using Basic with user 'test'
+> GET /summary?page=8 HTTP/1.1
+> Host: 127.0.0.1:8000
+> Authorization: Basic fjkljhfedkhjze
+> User-Agent: curl/8.4.0
+> Accept: */*
+> 
+< HTTP/1.1 200 OK
+< date: Sun, 14 Apr 2024 16:58:05 GMT
+< server: uvicorn
+< content-length: 4532
+< content-type: application/json
+< 
+{ [4532 bytes data]
+100  4532  100  4532    0     0  16924      0 --:--:-- --:--:-- --:--:-- 16973
+* Connection #0 to host 127.0.0.1 left intact
+{
+    "stats": {
+        "count": 25,
+        "total": 725,
+        "page": 8,
+        "page_size": 100,
+        "total_page": 8
+    },
+    "decisions": [
+        {
+            "title": "Cour de cassation, Chambre mixte, ...",
+            "identifier": "JURITEXTxxxxxxx",
+            "code_chambre": "CHAMBRE_MIXTE"
+        },
+...
+```
+
+## Start and Stop the pod
+
+To stop the pod(and all containers into):
+```
+$ podman pod stop cassapod
+```
+To restart:
+```
+$ podman pod start cassapod
+```
