@@ -1,8 +1,10 @@
-import os
-from contextlib import asynccontextmanager
-import sys
 import asyncio
+from contextlib import asynccontextmanager
+import os
+import sys
+
 from elasticsearch import AsyncElasticsearch, Elasticsearch
+
 from app.exceptions import ConfigurationError
 
 

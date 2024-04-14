@@ -1,11 +1,11 @@
 import json
 import math
+import secrets
+from typing import Union, Annotated
 
 from fastapi import FastAPI, Depends, HTTPException, Response, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic_settings import BaseSettings
-import secrets
-from typing import Union, Annotated
 
 from app.es import async_client
 from app.services.decision import DecisionService
