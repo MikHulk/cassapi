@@ -4,24 +4,24 @@ La cour de cassation nous fournit une partie de ses décisions via ce dépôt:
 
 Ce dépôt contient des archives avec des fichiers XML correspondant chacun à une
 décision rendue par la cour de cassation.
-- [ ] faire un premier script afin de récupérer et stocker les décisions de
+- [x] faire un premier script afin de récupérer et stocker les décisions de
       la cour de cassation.
-- [ ] API REST permettant d’exposer ces décisions. L’API doit gérer les cas
+- [x] API REST permettant d’exposer ces décisions. L’API doit gérer les cas
       suivants :
-  - [ ] Renvoyer une liste de toutes les décisions de cour de cassation 
+  - [x] Renvoyer une liste de toutes les décisions de cour de cassation 
         (afficher uniquement l’identifiant et le titre de la décision)
-  - [ ] Pouvoir filtrer les décisions par chambre (dans le document XML voir
+  - [x] Pouvoir filtrer les décisions par chambre (dans le document XML voir
         élément FORMATION: TEXTEJURIJUDI > META > METASPEC > METAJURI_JUDI > FORMATION)
-  - [ ] Renvoyer le contenu d’une décision (identifiant, titre et contenu) en 
+  - [x] Renvoyer le contenu d’une décision (identifiant, titre et contenu) en 
         fonction d’un identifiant de décision
-  - [ ] L’API doit être accessible uniquement en utilisant un login / mot de passe
-  - [ ] L’API doit renvoyer les données en JSON
-  - [ ] [BONUS] Faire une recherche textuelle basique qui retourne les décisions 
+  - [x] L’API doit être accessible uniquement en utilisant un login / mot de passe
+  - [x] L’API doit renvoyer les données en JSON
+  - [x] [BONUS] Faire une recherche textuelle basique qui retourne les décisions 
         correspondantes triées par score de pertinence
 
 Ce qui est attendu:
-- [ ] L’application doit pouvoir se lancer en utilisant docker
-- [ ] Le code source doit être hébergé dans un dépôt Git privé (i.e. Gitlab, Github …) 
+- [x] L’application doit pouvoir se lancer en utilisant docker
+- [x] Le code source doit être hébergé dans un dépôt Git privé (i.e. Gitlab, Github …) 
   et un lien devra nous être transmis
 - Nous nous attendons à un niveau de qualité de code qui pourrait aller en production
 
