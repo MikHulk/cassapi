@@ -77,7 +77,7 @@ pytest app
 
 > [!IMPORTANT]
 > I am using podman here but these instructions are easily transposable to docker or
-> kubernetes. The Dockerfile is no more no less a "classic" docker file and will work
+> kubernetes. The Dockerfile is, no more, no less, a "classic" docker file and will work
 > with docker.
 
 One can build a new image from the provided Dockerfile.
@@ -86,12 +86,12 @@ One can build a new image from the provided Dockerfile.
 podman build -t cassapi .
 ```
 
-Certificat for Elastic search, network or pod configuration and environment variable
+Certificat for Elastic search, network or pod configuration and environment variables
 have to be specified at **run time**. A dir is available as mount point in the container
-`/usr/local/cassapi` to share data.
+to share data `/usr/local/cassapi` .
 
-By instance here we put the es certificate in `./dockershare` and share it with the container.
-We pass an env file for credentials too with `env-file` option:
+By instance here we put the es certificate in `./dockershare` and share it with the
+container. We pass an env file for credentials too with `env-file` option:
 
 ```
 podman run --pod cassapod --rm --name cassapi \
@@ -100,9 +100,9 @@ podman run --pod cassapod --rm --name cassapi \
 
 # Document Initial Indexing
 
-The document are fetched from DILA repo and indexed in Elastic Search with the dedicated script
-`app/scripts/ininitscript.py`. You can run it directly or from a container with propers 
-positional arguments.
+The documents are fetched from DILA repo and indexed in Elastic Search with the dedicated
+script `app/scripts/ininitscript.py`. You can run it directly or from a container with 
+propers positional arguments.
 
 ```
 $ python app/scripts/initscript.py --help
@@ -119,7 +119,7 @@ options:
   -h, --help  show this help message and exit
 ```
 
-an example:
+An example:
 
 ```
 $ python app/scripts/initscript.py https://echanges.dila.gouv.fr/OPENDATA/CASS/ . demo
@@ -159,10 +159,10 @@ clean? y
 bye
 ```
 
-At the end the script show a report and asks for working dir removal. You can say y and the 
-fetched and extracted files will be removed. If you need to keep these file just answer 
+At the end the script shows a report and asks for working dir removal. You can say "y" and the 
+fetched and extracted files will be removed. If you need to keep these files just answer 
 something else and files will be available under the folder `./work-YYMMDD` under the path
-you passed with `dir` positional argument.
+you passed with the `dir` positional argument.
 
 
 # Rootless Podman Howto
@@ -210,7 +210,7 @@ INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
 INFO:     Finished server process [1]
 ```
-6. Now we can indexe document from dila repo from the container:
+6. Now we can indexe document repository dila repo from the container:
 ```
 $ podman exec -it cassapi bash
 root@cassapod:/usr/src/app# echo $PYTHONPATH
